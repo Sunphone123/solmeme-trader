@@ -20,6 +20,8 @@ export interface SimInput {
   notional?: number;
   /** keep the window's trend in the paths (by default only its volatility is replayed) */
   keepDrift?: boolean;
+  /** keep this many sample paths (every 3rd step) in the result, for charts */
+  dumpPaths?: number;
 }
 
 function rng(seed: number) {
@@ -59,9 +61,13 @@ export async function simulate(o: SimInput) {
   const tpTimes: number[] = [];
   const slTimes: number[] = [];
   const openRet: number[] = [];
+  const sample: { o: 'tp' | 'sl' | 'liq' | 'open'; px: number[] }[] = [];
   for (let p = 0; p < o.paths; p++) {
     let lp = 0; // log price relative to entry
     let done = false;
+    const keep = !!o.dumpPaths && p < o.dumpPaths;
+    const trace: number[] = keep ? [entry] : [];
+    let outcome: 'tp' | 'sl' | 'liq' | 'open' = 'open';
     let j = Math.floor(rand() * moves.length);
     for (let s = 0; s < steps; s++) {
       if (s % BLOCK === 0) j = Math.floor(rand() * (moves.length - BLOCK));
@@ -77,17 +83,25 @@ export async function simulate(o: SimInput) {
         sl++;
         slTimes.push((s + 1) * 5);
         done = true;
+        outcome = 'sl';
       } else if (hitLiq) {
         lq++;
         done = true;
+        outcome = 'liq';
       } else if (hitTp) {
         tp++;
         tpTimes.push((s + 1) * 5);
         done = true;
+        outcome = 'tp';
       }
-      if (done) break;
+      if (done) {
+        if (keep) trace.push(outcome === 'tp' ? o.tp! : outcome === 'sl' ? o.sl! : liq);
+        break;
+      }
       lp += mv[0];
+      if (keep && s % 3 === 2) trace.push(entry * Math.exp(lp));
     }
+    if (keep) sample.push({ o: outcome, px: trace });
     if (!done) {
       open++;
       openRet.push(Math.exp(lp) - 1);
@@ -121,6 +135,7 @@ export async function simulate(o: SimInput) {
     breakEvenWinRate: be !== null ? be * 100 : null,
     dailyVolPct: vol5m * Math.sqrt(288) * 100,
     windowTrendPct: (Math.exp(drift * raw.length) - 1) * 100,
+    sample,
     keptDrift: !!o.keepDrift,
   };
 }

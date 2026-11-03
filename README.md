@@ -16,12 +16,18 @@ Seven skills that Claude picks up on its own:
 
 ## Install
 
+Easiest: send this message to Claude Code, and it installs everything itself:
+
+> Install the SolMeme Trader plugin. Run `claude plugin marketplace add Sunphone123/solmeme-trader` and `claude plugin install solmeme-trader@solmeme` in the terminal, check that Node.js 18 or newer is installed (install it if not), then tell me to restart Claude Code.
+
+Or by hand inside Claude Code:
+
 ```
-/plugin marketplace add <github-owner>/solmeme-trader
+/plugin marketplace add Sunphone123/solmeme-trader
 /plugin install solmeme-trader@solmeme
 ```
 
-Needs Node.js 18+. Then just ask: *"scan SolMeme perps"*, *"plan a SOL long with a 1 ATR stop and check it in the time machine"*, *"how did my trades go this week?"*.
+Needs Node.js 18+. After installing, restart Claude Code. Then just ask: *"scan SolMeme perps"*, *"plan a SOL long with a 1 ATR stop and check it in the time machine"*, *"how did my trades go this week?"*.
 
 ## Safety
 

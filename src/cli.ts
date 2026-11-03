@@ -243,7 +243,7 @@ async function main() {
     case 'sim': {
       const side = str('side') as 'long' | 'short' | undefined;
       if (side !== 'long' && side !== 'short') throw new Error('Give --side long or --side short');
-      const r = await simulate({ coin: sub ?? '', side, entry: num('entry'), tp: num('tp'), sl: num('sl'), leverage: num('lev') ?? 3, hours: num('hours') ?? 24, paths: Math.min(50000, num('paths') ?? 10000), lookbackDays: num('days') ?? 14, notional: num('usd'), keepDrift: has('keep-drift') });
+      const r = await simulate({ coin: sub ?? '', side, entry: num('entry'), tp: num('tp'), sl: num('sl'), leverage: num('lev') ?? 3, hours: num('hours') ?? 24, paths: Math.min(50000, num('paths') ?? 10000), lookbackDays: num('days') ?? 14, notional: num('usd'), keepDrift: has('keep-drift'), dumpPaths: num('dump-paths') });
       const P = r.probs;
       const text =
         `TIME MACHINE — ${r.market.label} ${side} ${r.notional ? usd(r.notional, 0) : ''} at ${px(r.entry)}, ${num('lev') ?? 3}x, next ${r.hours}h\n` +

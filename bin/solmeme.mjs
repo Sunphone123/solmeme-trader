@@ -50864,9 +50864,13 @@ async function simulate(o) {
   const tpTimes = [];
   const slTimes = [];
   const openRet = [];
+  const sample = [];
   for (let p = 0; p < o.paths; p++) {
     let lp = 0;
     let done = false;
+    const keep = !!o.dumpPaths && p < o.dumpPaths;
+    const trace = keep ? [entry] : [];
+    let outcome = "open";
     let j = Math.floor(rand() * moves.length);
     for (let s = 0; s < steps; s++) {
       if (s % BLOCK === 0) j = Math.floor(rand() * (moves.length - BLOCK));
@@ -50882,17 +50886,25 @@ async function simulate(o) {
         sl++;
         slTimes.push((s + 1) * 5);
         done = true;
+        outcome = "sl";
       } else if (hitLiq) {
         lq++;
         done = true;
+        outcome = "liq";
       } else if (hitTp) {
         tp++;
         tpTimes.push((s + 1) * 5);
         done = true;
+        outcome = "tp";
       }
-      if (done) break;
+      if (done) {
+        if (keep) trace.push(outcome === "tp" ? o.tp : outcome === "sl" ? o.sl : liq);
+        break;
+      }
       lp += mv[0];
+      if (keep && s % 3 === 2) trace.push(entry * Math.exp(lp));
     }
+    if (keep) sample.push({ o: outcome, px: trace });
     if (!done) {
       open2++;
       openRet.push(Math.exp(lp) - 1);
@@ -50925,6 +50937,7 @@ async function simulate(o) {
     breakEvenWinRate: be !== null ? be * 100 : null,
     dailyVolPct: vol5m * Math.sqrt(288) * 100,
     windowTrendPct: (Math.exp(drift * raw.length) - 1) * 100,
+    sample,
     keptDrift: !!o.keepDrift
   };
 }
@@ -51253,7 +51266,7 @@ No single print above ${big(num("min-usd") ?? 5e4)} in this window.`,
     case "sim": {
       const side = str("side");
       if (side !== "long" && side !== "short") throw new Error("Give --side long or --side short");
-      const r = await simulate({ coin: sub2 ?? "", side, entry: num("entry"), tp: num("tp"), sl: num("sl"), leverage: num("lev") ?? 3, hours: num("hours") ?? 24, paths: Math.min(5e4, num("paths") ?? 1e4), lookbackDays: num("days") ?? 14, notional: num("usd"), keepDrift: has("keep-drift") });
+      const r = await simulate({ coin: sub2 ?? "", side, entry: num("entry"), tp: num("tp"), sl: num("sl"), leverage: num("lev") ?? 3, hours: num("hours") ?? 24, paths: Math.min(5e4, num("paths") ?? 1e4), lookbackDays: num("days") ?? 14, notional: num("usd"), keepDrift: has("keep-drift"), dumpPaths: num("dump-paths") });
       const P2 = r.probs;
       const text = `TIME MACHINE \u2014 ${r.market.label} ${side} ${r.notional ? usd(r.notional, 0) : ""} at ${px(r.entry)}, ${num("lev") ?? 3}x, next ${r.hours}h
 ${r.paths.toLocaleString("en-US")} paths built from ${r.candlesUsed.toLocaleString("en-US")} real 5-minute candles of the last ${r.lookbackDays} days (daily volatility \u2248 ${r.dailyVolPct.toFixed(1)}%)
