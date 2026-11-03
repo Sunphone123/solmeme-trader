@@ -1,0 +1,15 @@
+{
+  "name": "solmeme",
+  "description": "SolMeme plugins for Claude Code: trade SolMeme perps from Claude.",
+  "owner": {
+    "name": "SolMeme",
+    "url": "https://sol-meme.com"
+  },
+  "plugins": [
+    {
+      "name": "solmeme-trader",
+      "source": "./",
+      "description": "Trade SolMeme perps from Claude: scanner, live pulse, time machine, risk manager, trader and journal. Paper trading by default."
+    }
+  ]
+}

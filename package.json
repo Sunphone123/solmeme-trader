@@ -1,0 +1,28 @@
+{
+  "name": "solmeme-trader",
+  "version": "0.1.0",
+  "description": "Claude skills for trading SolMeme perps (powered by Hyperliquid): scan, simulate, size, trade, journal.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/cli.ts --bundle --platform=node --format=esm --target=node18 --external:bufferutil --external:utf-8-validate --outfile=bin/solmeme.mjs --banner:js=\"process.noDeprecation=true;import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@nktkas/hyperliquid": "^0.33.3",
+    "@solana/web3.js": "^1.99.0",
+    "tweetnacl": "^1.0.3",
+    "viem": "^2.57.15",
+    "ws": "^8.22.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/ws": "^8.18.2",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "solmeme-trader",
+  "version": "0.1.0",
+  "description": "Trade SolMeme perps (crypto and stocks on Hyperliquid) from Claude: scanner, live pulse, time machine, risk manager, trader and journal. Paper trading by default.",
+  "author": { "name": "SolMeme", "url": "https://sol-meme.com" },
+  "homepage": "https://sol-meme.com",
+  "license": "MIT",
+  "keywords": ["trading", "perps", "hyperliquid", "solana", "solmeme"]
+}
