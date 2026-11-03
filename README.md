@@ -37,6 +37,18 @@ Needs Node.js 18+. After installing, restart Claude Code. Then just ask: *"scan 
 - **Your keys stay on your computer** in `~/.solmeme`. Claude never asks for them; import goes through a file you create, which is deleted after import.
 - **The same account as on sol-meme.com.** The perps account is derived from your Solana key with the same rule as the SolMeme terminal: import the key there and you see Claude's positions live.
 
+## What the code does with your key
+
+Check it yourself, or ask Claude to read `src/` before installing:
+
+- The key is stored only in `~/.solmeme/wallet.json` with file mode 600 (`src/store.ts`, `src/keys.ts`). It is never sent anywhere; orders and messages are signed locally.
+- Network calls, all in `src/`:
+  - `api.hyperliquid.xyz`: market data, the live trade stream and signed orders.
+  - `api.hyperunit.xyz`: bridge deposit addresses. They are checked against the guardians' signatures before use.
+  - `solana-rpc.publicnode.com`: SOL balance and the deposit transfer.
+  - `sol-meme.com/api`: two calls with public data only. `GET /terminal/perps-fee` sends your public wallet address and invite. `POST /terminal/perps-account` puts you on the leaderboard with your public addresses and a signed message.
+- `bin/solmeme.mjs` is `src/` bundled with esbuild (`npm run build`), so you can rebuild it and compare.
+
 Trading perpetual futures with leverage can lose more than you expect, fast. The time machine replays past volatility; it does not predict prices. Nothing here is financial advice.
 
 ## Fees
